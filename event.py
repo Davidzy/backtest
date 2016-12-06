@@ -1,36 +1,32 @@
 class Event(object):
     """
-    Event is base class providing an interface of all subsequent (inherited)
-    events, that will trigger further events in the trading infrastructure.
+    Event作为基类，为其他Event类（子类）提供接口。
     """
     pass
 
 
 class MarketEvent(Event):
     """
-    Handles the event of receiving a new market update with corresponding bars.
+    接收市场价格信息的更新。
     """
     def __init__(self):
         """
-        Initializes the MarketEvent.
+        初始化MarketEvent.
         """
         self.type = 'MARKET'
 
 
 class SignalEvent(Event):
     """
-    Handles the event of sending a Signal from Strategy object. This is received
-    by a Portfolio object and acted upon.
+    通过Strategy对象发出信号事件。Portfolio对象接收该事件，并基于此做出决策。
     """
     def __init__(self, strategy_id, symbol, datetime, signal_type, strength):
         """
-        :param strategy_id: The unique identifier for the strategy that
-            generated the signal.
-        :param symbol: The ticker symbol, e.g. 'AAPL'.
-        :param datetime: The timestamp at which the signal was generated.
-        :param signal_type: 'LONG' OR 'SHORT'.
-        :param strength: an adjustment factor "suggestion" used to scale
-            quantity at the portfolio level. Useful for pairs strategies.
+        :param strategy_id: 唯一标示发出信号的Strategy对象
+        :param symbol: 股票代码标识，如'AAPL'
+        :param datetime: 信号产生的时间戳
+        :param signal_type: 'LONG'或'SHORT'
+        :param strength: 调仓的权重系数，在投资组合中建议买入或卖出的数量.
         """
         self.type = 'SIGNAL'
         self.strategy = strategy_id
@@ -42,19 +38,17 @@ class SignalEvent(Event):
 
 class OrderEvent(Event):
     """
-    Handles the event of sending an order to an execution system. The order
-    contains a symbol (e.g. 'AAPL'), a type (market or limit), quantity and
-    a direction.
+    向交易系统发送OrderEvent。Order包含标识(e.g. 'AAPL')，类型(market or limit)，
+    数量和方向。
     """
     def __init__(self, symbol, order_type, quantity, direction):
         """
-        Initializes the order type, setting whether it is a Market order ('MKT')
-        or Limit order ('LMT'), has a quantity (integral) and its direction (
-        'BUY' or 'SELL').
+        初始化order类型，确定是Market order('MKT')还是Limit order('LMT')，还包含数量和
+        买卖的方向('BUY' or 'SELL')。
 
-        :param symbol: The instrument to trade.
+        :param symbol: 交易的对象
         :param order_type: 'MKT' or 'LMT' for Market or Limit.
-        :param quantity: Non-negative integer for quantity.
+        :param quantity: 非负整数表示的数量
         :param direction: 'BUY' or 'SELL' for long or short.
         """
         self.type = 'ORDER'
@@ -111,16 +105,12 @@ class FillEvent(Event):
 
     def calculate_commission(self):
         """
-        Calculates the fees of trading based on
 
-        This does not include exchange or ECN fees.
         :return: value in number
         """
         full_cost = 1.3
         if self.quantity <= 500:
-            full_cost = max(1.3, 0.0013 * self.quantity)
+            full_cost = max(full_cost, 0.0013 * self.quantity)
         else:
-            full_cost = max(1.3, 0.0008 * self.quantity)
+            full_cost = max(full_cost, 0.0008 * self.quantity)
         return full_cost
-
-

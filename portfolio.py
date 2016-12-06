@@ -44,8 +44,7 @@ class Portfolio(object):
         self.initial_capital = initial_capital
 
         self.all_positions = self.construct_all_positions()
-        self.current_positions = dict( (k, v) for k, v in \
-                                       [(s, 0) for s in self.symbol_list] )
+        self.current_positions = self.construct_current_position()
 
         self.all_holdings = self.construct_all_holdings()
         self.current_holdings = self.construct_current_holdings()
@@ -60,13 +59,21 @@ class Portfolio(object):
         d['datetime'] = self.start_date
         return [d]
 
+    def construct_current_position(self):
+        """
+
+        :return:
+        """
+        d = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
+        return d
+
     def construct_all_holdings(self):
         """
         Constructs the holdings list using the start_date
         to determine when the time index will begin.
         :return:
         """
-        d = dict( (k, v) for k, v in [(s, 0.0) for s in self.symbol_lists] )
+        d = dict( (k, v) for k, v in [(s, 0.0) for s in self.symbol_list] )
         d['datetime'] = self.start_date
         d['cash'] = self.initial_capital
         d['commission'] = 0.0
@@ -147,7 +154,7 @@ class Portfolio(object):
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
         self.current_holdings['cash'] -= (cost + fill.commission)
-        self.current_holdings['total'] -= (cost + fill.commission)
+        self.current_holdings['total'] -= (cost + fill.commission) #???
 
     def update_fill(self, event):
         """
@@ -215,7 +222,7 @@ class Portfolio(object):
         returns = self.equity_curve['returns']
         pnl = self.equity_curve['equity_curve']
 
-        sharpe_ratio = create_sharpe_ratio(returns, periods=252*60*6.5)
+        sharpe_ratio = create_sharpe_ratio(returns)
         drawdown, max_dd, dd_duration = create_drawdowns(pnl)
         self.equity_curve['drawdown'] = drawdown
 

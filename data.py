@@ -24,29 +24,28 @@ class DataHandler(object):
     @abstractmethod
     def get_latest_bar(self, symbol):
         """
-        :return: returns the last bar updated.
+        :return: 返回最近时刻的价格信息
         """
         raise NotImplementedError("Should implement get_latest_bar()")
 
     @abstractmethod
     def get_latest_bars(self, symbol, N=1):
         """
-        :return: returns the last N bar updated.
+        :return: 返回最后N时刻的价格信息
         """
         raise NotImplementedError("Should implement get_latest_bars()")
 
     @abstractmethod
     def get_latest_bar_datetime(self, symbol):
         """
-        :return: Returns a Python datetime object for the last bar.
+        :return: 返回Python datetime类型的对象，最后时刻日期时间的具体值
         """
         raise NotImplementedError("Should implement get_latest_bar_datetime()")
 
     @abstractmethod
     def get_latest_bar_value(self, symbol, val_type):
         """
-        :return: Returns one of the Open, High, Low, Close, Volume or OI from
-            the last bar.
+        :return: 返回股价中的高开低收(Open, High, Low, Close, Volume)等数据的其中一项
         """
         raise NotImplementedError("Should implement get_latest_bar_value()")
 
