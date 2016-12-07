@@ -55,7 +55,7 @@ class Backtest(object):
         """
         print("Creating DataHandler, Strategy, Portfolio and ExecutionHandler")
         self.data_handler = self.data_handler_cls(self.events,
-            self.csv_dir, self.symbol_list)
+            self.csv_dir, self.symbol_list, self.start_date)
         self.strategy = self.strategy_cls(self.data_handler, self.events)
         self.portfolio = self.portfolio_cls(self.data_handler, self.events,
             self.start_date, self.initial_capital)

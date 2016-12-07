@@ -18,7 +18,7 @@ class MovingAverageCrossStrategy(Strategy):
     windows are 100/400 periods respectively.
     """
 
-    def __init__(self, bars, events, short_window=10, long_window=40):
+    def __init__(self, bars, events, short_window=30, long_window=120):
         """
         Initialises the Moving Average Cross Strategy.
         :param bars: The DataHandler object that provides bar information.

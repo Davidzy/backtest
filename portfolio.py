@@ -49,6 +49,9 @@ class Portfolio(object):
         self.all_holdings = self.construct_all_holdings()
         self.current_holdings = self.construct_current_holdings()
 
+        self.equity_curve = None  # will be calculated in method of
+        # create_equity_curve_dataframe
+
     def construct_all_positions(self):
         """
         Constructs the positions list using the start_date
@@ -98,6 +101,8 @@ class Portfolio(object):
         current market data at this stage is known (OHLCV).
         Makes use of a MarketEvent from the events queue.
         """
+        assert event.type == 'MARKET', "Only MarketEvent should run here!"
+
         latest_datetime = self.bars.get_latest_bar_datetime(self.symbol_list[0])
 
         dp = dict( (k, v) for k, v in [(s, 0) for s in self.symbol_list] )
@@ -154,16 +159,16 @@ class Portfolio(object):
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
         self.current_holdings['cash'] -= (cost + fill.commission)
-        self.current_holdings['total'] -= (cost + fill.commission) #???
+        self.current_holdings['total'] -= (cost + fill.commission)  # ???
 
-    def update_fill(self, event):
+    def update_fill(self, fill_event):
         """
         Updates the portfolio current positions and holdings
         from a FillEvent.
         """
-        if event.type == 'FILL':
-            self.update_postions_from_fill(event)
-            self.update_holdings_from_fill(event)
+        if fill_event.type == 'FILL':
+            self.update_postions_from_fill(fill_event)
+            self.update_holdings_from_fill(fill_event)
 
     def generate_naive_order(self, signal):
         """
@@ -209,6 +214,7 @@ class Portfolio(object):
         list of dictionaries.
         """
         curve = pd.DataFrame(self.all_holdings)
+        # !!! all_holdings have duplicate index at start and end, why?
         curve.set_index('datetime', inplace=True)
         curve['returns'] = curve['total'].pct_change()
         curve['equity_curve'] = (1.0 + curve['returns']).cumprod()

@@ -73,7 +73,7 @@ class HistoricCSVDataHandler(DataHandler):
     symbol from disk and provide an interface to obtain the "latest" bar in
     a manner identical to a live trading interface.
     """
-    def __init__(self, events, csv_dir, symbol_list):
+    def __init__(self, events, csv_dir, symbol_list, start_date):
         """
         Initialises the historic data handler by requesting
         the location of the CSV files and a list of symbols.
@@ -86,6 +86,7 @@ class HistoricCSVDataHandler(DataHandler):
         self.events = events
         self.csv_dir = csv_dir
         self.symbol_list = symbol_list
+        self.start_date = start_date
 
         self.symbol_data = {}
         self.latest_symbol_data = {}
@@ -103,14 +104,16 @@ class HistoricCSVDataHandler(DataHandler):
         comb_index = None
         for s in self.symbol_list:
             # Load the CSV
-            self.symbol_data[s] = pd.read_csv(
+            df = pd.read_csv(
                 os.path.join(self.csv_dir, "{fname}.csv".format(fname=s)),
                 parse_dates = True,
                 header=0,
                 index_col=0,
                 names=['datetime', 'open', 'high', 'low', 'close', 'volume',
                        'adj_close']
-            ).sort()
+            )
+            # Truncate the data according to start_date
+            self.symbol_data[s] = df.sort_index().ix[self.start_date:]
 
             if comb_index is None:
                 comb_index = self.symbol_data[s].index
@@ -207,4 +210,11 @@ class HistoricCSVDataHandler(DataHandler):
             else:
                 if bar is not None:
                     self.latest_symbol_data[s].append(bar)
-        self.events.put(MarketEvent())
+        if self.continue_backtest:
+            self.events.put(MarketEvent())  # Bug! When except occur, it means
+            # the backtest should be terminated. So in this time, we should not
+            # generate a MarketEvent again.
+
+        # self.events.put(MarketEvent())  Bug! When except occur, it means
+        # the backtest should be terminated. So in this time, we should not
+        # generate a MarketEvent again.
