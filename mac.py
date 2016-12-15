@@ -18,7 +18,7 @@ class MovingAverageCrossStrategy(Strategy):
     windows are 100/400 periods respectively.
     """
 
-    def __init__(self, bars, events, short_window=30, long_window=120):
+    def __init__(self, bars, events, short_window=10, long_window=30):
         """
         Initialises the Moving Average Cross Strategy.
         :param bars: The DataHandler object that provides bar information.
@@ -81,7 +81,7 @@ class MovingAverageCrossStrategy(Strategy):
 
 if __name__ == "__main__":
     csv_dir = '/home/david/Downloads'
-    symbol_list = ['AAPL']
+    symbol_list = ['AAPL', 'GOOG']
     initial_capital = 100000.0
     heartbeat = 0.0
     start_date = datetime.datetime(2014, 1, 1, 0, 0, 0)

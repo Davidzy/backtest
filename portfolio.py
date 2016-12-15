@@ -187,6 +187,9 @@ class Portfolio(object):
         mkt_quantity = 100
         cur_quantity = self.current_positions[symbol]
         order_type = 'MKT'
+        avaible_quantity = int(self.current_holdings['cash'] / \
+                           self.bars.get_latest_bar_value(symbol, 'adj_close'))
+        mkt_quantity = min(avaible_quantity, mkt_quantity)
 
         if direction == 'LONG' and cur_quantity == 0:
             order = OrderEvent(symbol, order_type, mkt_quantity, 'BUY')
